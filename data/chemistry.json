@@ -1,0 +1,386 @@
+// GENESIS chemistry.
+//
+// Real thermodynamic data. dHf is standard enthalpy of formation in kJ/mol,
+// S is standard molar entropy in J/(mol.K), Cp is molar heat capacity in
+// J/(mol.K), melt and boil are in kelvin, density in g/cm3.
+//
+// EVERY reaction below is checked for balance when this file loads. An equation
+// that does not conserve atoms and charge will REFUSE TO LOAD and name the
+// offending element -- there is no silent creation of matter here. Nuclear
+// reactions are the one exception, and correctly so: they transmute elements,
+// and what they conserve is nucleon number and charge, which is what is checked
+// for them instead.
+//
+// Ea is the activation energy in kJ/mol and A the Arrhenius pre-exponential
+// factor; together they decide whether a thermodynamically downhill reaction is
+// actually fast enough to happen at the temperature available. That is what
+// stops iron oxide reducing at room temperature just because the free energy
+// permits it.
+{
+  "substances": [
+    // -- elements in their standard states (dHf = 0 by definition) --
+    { "name": "Carbon (graphite)", "formula": "C", "phase": "s", "dHf": 0, "S": 5.74, "Cp": 8.5, "melt": 3823, "density": 2.267, "common": "charcoal", "note": "The universal reductant. Charcoal is how every pre-industrial metallurgy got its carbon." },
+    { "name": "Hydrogen", "formula": "H2", "phase": "g", "dHf": 0, "S": 130.68, "Cp": 28.8, "boil": 20.27 },
+    { "name": "Oxygen", "formula": "O2", "phase": "g", "dHf": 0, "S": 205.15, "Cp": 29.4, "boil": 90.19 },
+    { "name": "Nitrogen", "formula": "N2", "phase": "g", "dHf": 0, "S": 191.61, "Cp": 29.1, "boil": 77.36 },
+    { "name": "Chlorine", "formula": "Cl2", "phase": "g", "dHf": 0, "S": 223.08, "Cp": 33.9, "boil": 239.11 },
+    { "name": "Sulfur", "formula": "S", "phase": "s", "dHf": 0, "S": 32.05, "Cp": 22.6, "melt": 388.36, "density": 2.07, "note": "Gunpowder and, later, sulfuric acid." },
+    { "name": "Iron", "formula": "Fe", "phase": "s", "dHf": 0, "S": 27.28, "Cp": 25.1, "melt": 1811, "density": 7.874 },
+    { "name": "Copper", "formula": "Cu", "phase": "s", "dHf": 0, "S": 33.15, "Cp": 24.4, "melt": 1357.77, "density": 8.96, "note": "Soft on its own. Alloyed with tin it becomes bronze, which is the whole point of tin." },
+    { "name": "Tin", "formula": "Sn", "phase": "s", "dHf": 0, "S": 51.18, "Cp": 27.0, "melt": 505.08, "density": 7.265, "note": "The bronze bottleneck: rare, and rarely found where copper is." },
+    { "name": "Zinc", "formula": "Zn", "phase": "s", "dHf": 0, "S": 41.63, "Cp": 25.4, "melt": 692.68, "boil": 1180, "density": 7.14, "note": "Boils below its own smelting temperature, so it must be distilled rather than poured." },
+    { "name": "Lead", "formula": "Pb", "phase": "s", "dHf": 0, "S": 64.81, "Cp": 26.4, "melt": 600.61, "density": 11.34 },
+    { "name": "Aluminium", "formula": "Al", "phase": "s", "dHf": 0, "S": 28.30, "Cp": 24.2, "melt": 933.47, "density": 2.70, "note": "Abundant and unreachable without electricity: the oxide is far too stable to reduce with carbon." },
+    { "name": "Calcium", "formula": "Ca", "phase": "s", "dHf": 0, "S": 41.59, "Cp": 25.9, "melt": 1115, "density": 1.55 },
+    { "name": "Sodium", "formula": "Na", "phase": "s", "dHf": 0, "S": 51.30, "Cp": 28.2, "melt": 370.94, "density": 0.968 },
+    { "name": "Silicon", "formula": "Si", "phase": "s", "dHf": 0, "S": 18.81, "Cp": 20.0, "melt": 1687, "density": 2.329 },
+    { "name": "Magnesium", "formula": "Mg", "phase": "s", "dHf": 0, "S": 32.67, "Cp": 24.9, "melt": 923, "density": 1.738 },
+    { "name": "Tungsten", "formula": "W", "phase": "s", "dHf": 0, "S": 32.64, "Cp": 24.3, "melt": 3695, "density": 19.25, "note": "The highest melting point of any metal." },
+    { "name": "Mercury", "formula": "Hg", "phase": "l", "dHf": 0, "S": 75.90, "Cp": 27.98, "melt": 234.32, "boil": 629.88, "density": 13.534 },
+    { "name": "Silver", "formula": "Ag", "phase": "s", "dHf": 0, "S": 42.55, "Cp": 25.4, "melt": 1234.93, "density": 10.49 },
+    { "name": "Gold", "formula": "Au", "phase": "s", "dHf": 0, "S": 47.49, "Cp": 25.4, "melt": 1337.33, "density": 19.30, "note": "Found native, which is why it is worked long before anything that needs smelting." },
+
+    // -- oxides and ores --
+    { "name": "Water", "formula": "H2O", "phase": "l", "dHf": -285.83, "S": 69.95, "Cp": 75.3, "melt": 273.15, "boil": 373.15, "density": 1.0, "solubility": -1 },
+    { "name": "Steam", "formula": "H2O", "phase": "g", "dHf": -241.82, "S": 188.84, "Cp": 33.6 },
+    { "name": "Carbon dioxide", "formula": "CO2", "phase": "g", "dHf": -393.51, "S": 213.79, "Cp": 37.1 },
+    { "name": "Carbon monoxide", "formula": "CO", "phase": "g", "dHf": -110.53, "S": 197.66, "Cp": 29.1, "note": "The actual reducing agent in a charcoal furnace, not the carbon itself." },
+    { "name": "Methane", "formula": "CH4", "phase": "g", "dHf": -74.87, "S": 186.25, "Cp": 35.7 },
+    { "name": "Ammonia", "formula": "NH3", "phase": "g", "dHf": -45.94, "S": 192.77, "Cp": 35.1, "note": "Fixed nitrogen: fertiliser, and explosives." },
+    { "name": "Hematite", "formula": "Fe2O3", "phase": "s", "dHf": -824.2, "S": 87.4, "Cp": 103.9, "density": 5.24, "common": "rust", "note": "Abundant, and useless until you can reach roughly 1200 K with a reducing atmosphere." },
+    { "name": "Magnetite", "formula": "Fe3O4", "phase": "s", "dHf": -1118.4, "S": 146.4, "Cp": 143.4, "density": 5.15 },
+    { "name": "Wuestite", "formula": "FeO", "phase": "s", "dHf": -272.0, "S": 60.75, "Cp": 49.9, "density": 5.74 },
+    { "name": "Cementite", "formula": "Fe3C", "phase": "s", "dHf": 25.1, "S": 104.6, "Cp": 105.9, "density": 7.69, "note": "The hard carbide phase. How much of it forms, and how coarse it is, decides whether iron is soft or is steel." },
+    { "name": "Copper(II) oxide", "formula": "CuO", "phase": "s", "dHf": -157.3, "S": 42.63, "Cp": 42.3, "density": 6.31 },
+    { "name": "Copper(I) oxide", "formula": "Cu2O", "phase": "s", "dHf": -168.6, "S": 93.14, "Cp": 63.6, "density": 6.0 },
+    { "name": "Malachite", "formula": "Cu2CO3(OH)2", "phase": "s", "dHf": -1051.4, "S": 186.2, "Cp": 154.0, "density": 4.0, "note": "The first ore anyone smelts: it decomposes in an ordinary fire and the oxide then reduces at a temperature a pottery kiln can reach." },
+    { "name": "Chalcopyrite", "formula": "CuFeS2", "phase": "s", "dHf": -190.4, "S": 124.9, "Cp": 100.0, "density": 4.2, "note": "Far more abundant than malachite, and needs roasting first because of the sulfur." },
+    { "name": "Cassiterite", "formula": "SnO2", "phase": "s", "dHf": -580.7, "S": 52.3, "Cp": 52.6, "density": 6.99 },
+    { "name": "Zinc oxide", "formula": "ZnO", "phase": "s", "dHf": -350.5, "S": 43.7, "Cp": 40.3, "density": 5.61 },
+    { "name": "Sphalerite", "formula": "ZnS", "phase": "s", "dHf": -206.0, "S": 57.7, "Cp": 46.0, "density": 4.05 },
+    { "name": "Litharge", "formula": "PbO", "phase": "s", "dHf": -217.32, "S": 68.70, "Cp": 45.8, "density": 9.53 },
+    { "name": "Galena", "formula": "PbS", "phase": "s", "dHf": -100.4, "S": 91.2, "Cp": 49.5, "density": 7.6 },
+    { "name": "Cinnabar", "formula": "HgS", "phase": "s", "dHf": -58.2, "S": 82.4, "Cp": 48.4, "density": 8.1 },
+    { "name": "Quartz", "formula": "SiO2", "phase": "s", "dHf": -910.86, "S": 41.46, "Cp": 44.4, "melt": 1983, "density": 2.65, "common": "silica", "note": "Sand. The feedstock for glass, and the reason soda ash matters." },
+    { "name": "Alumina", "formula": "Al2O3", "phase": "s", "dHf": -1675.7, "S": 50.92, "Cp": 79.0, "melt": 2345, "density": 3.95, "note": "One of the most stable oxides there is. Carbon cannot touch it." },
+    { "name": "Magnesia", "formula": "MgO", "phase": "s", "dHf": -601.6, "S": 26.95, "Cp": 37.2, "melt": 3125, "density": 3.58 },
+    { "name": "Rutile", "formula": "TiO2", "phase": "s", "dHf": -944.0, "S": 50.6, "Cp": 55.1, "density": 4.23 },
+    { "name": "Pyrolusite", "formula": "MnO2", "phase": "s", "dHf": -520.0, "S": 53.05, "Cp": 54.1, "density": 5.03 },
+    { "name": "Chromia", "formula": "Cr2O3", "phase": "s", "dHf": -1139.7, "S": 81.2, "Cp": 118.7, "density": 5.22 },
+    { "name": "Tungsten trioxide", "formula": "WO3", "phase": "s", "dHf": -842.9, "S": 75.9, "Cp": 73.8, "density": 7.16 },
+    { "name": "Vanadium pentoxide", "formula": "V2O5", "phase": "s", "dHf": -1550.6, "S": 131.0, "Cp": 127.7, "density": 3.36, "note": "Not a reagent here, a catalyst: it lowers the barrier for SO2 oxidation without being consumed." },
+    { "name": "Uraninite", "formula": "UO2", "phase": "s", "dHf": -1085.0, "S": 77.03, "Cp": 63.6, "density": 10.97 },
+
+    // -- carbonates, hydroxides, salts --
+    { "name": "Limestone", "formula": "CaCO3", "phase": "s", "dHf": -1207.6, "S": 91.7, "Cp": 83.5, "density": 2.71, "common": "calcite", "note": "Burn it and you get quicklime: mortar, plaster, and the flux that makes iron smelting practical." },
+    { "name": "Quicklime", "formula": "CaO", "phase": "s", "dHf": -635.09, "S": 39.75, "Cp": 42.0, "melt": 2886, "density": 3.34 },
+    { "name": "Slaked lime", "formula": "Ca(OH)2", "phase": "s", "dHf": -985.2, "S": 83.4, "Cp": 87.5, "density": 2.21 },
+    { "name": "Gypsum", "formula": "CaSO4", "phase": "s", "dHf": -1434.5, "S": 106.5, "Cp": 99.6, "density": 2.96 },
+    { "name": "Rock salt", "formula": "NaCl", "phase": "s", "dHf": -411.15, "S": 72.11, "Cp": 50.5, "melt": 1074, "density": 2.17, "solubility": 36.0, "common": "table salt" },
+    { "name": "Caustic soda", "formula": "NaOH", "phase": "s", "dHf": -425.6, "S": 64.46, "Cp": 59.5, "melt": 596, "density": 2.13, "solubility": 111.0 },
+    { "name": "Soda ash", "formula": "Na2CO3", "phase": "s", "dHf": -1130.7, "S": 135.0, "Cp": 112.3, "melt": 1124, "density": 2.54 },
+    { "name": "Sodium silicate", "formula": "Na2SiO3", "phase": "s", "dHf": -1554.9, "S": 113.8, "Cp": 111.8, "density": 2.4, "common": "glass", "note": "Soda-lime glass in its simplest form." },
+    { "name": "Niter", "formula": "KNO3", "phase": "s", "dHf": -494.6, "S": 133.05, "Cp": 96.4, "density": 2.11, "solubility": 38.0, "note": "The oxidiser in gunpowder. It supplies its own oxygen, which is why powder burns sealed in a tube." },
+    { "name": "Potassium sulfide", "formula": "K2S", "phase": "s", "dHf": -380.7, "S": 105.0, "Cp": 84.0, "density": 1.8 },
+    { "name": "Sylvite", "formula": "KCl", "phase": "s", "dHf": -436.5, "S": 82.6, "Cp": 51.3, "density": 1.98, "solubility": 34.0 },
+    { "name": "Kaolinite", "formula": "Al2Si2O5(OH)4", "phase": "s", "dHf": -4120.0, "S": 203.0, "Cp": 246.0, "density": 2.6, "common": "clay", "note": "Fire it and the water leaves for good: that irreversibility is what pottery is." },
+    { "name": "Metakaolin", "formula": "Al2Si2O7", "phase": "s", "dHf": -3270.0, "S": 160.0, "Cp": 200.0, "density": 2.5, "common": "fired clay" },
+
+    // -- acids and gases --
+    { "name": "Hydrogen chloride", "formula": "HCl", "phase": "g", "dHf": -92.31, "S": 186.90, "Cp": 29.1 },
+    { "name": "Sulfur dioxide", "formula": "SO2", "phase": "g", "dHf": -296.83, "S": 248.22, "Cp": 39.9 },
+    { "name": "Sulfur trioxide", "formula": "SO3", "phase": "g", "dHf": -395.72, "S": 256.77, "Cp": 50.7 },
+    { "name": "Sulfuric acid", "formula": "H2SO4", "phase": "l", "dHf": -814.0, "S": 156.9, "Cp": 138.9, "density": 1.83, "note": "The single most useful industrial chemical there is." },
+
+    // -- organics --
+    { "name": "Cellulose", "formula": "C6H10O5", "phase": "s", "dHf": -963.0, "S": 175.0, "Cp": 210.0, "density": 1.5, "common": "wood", "note": "What plants are made of, and therefore the starting point of fire, charcoal and everything after." },
+    { "name": "Glucose", "formula": "C6H12O6", "phase": "s", "dHf": -1273.3, "S": 212.1, "Cp": 218.9, "density": 1.54 },
+    { "name": "Ethanol", "formula": "C2H5OH", "phase": "l", "dHf": -277.6, "S": 160.7, "Cp": 112.3, "boil": 351.5, "density": 0.789, "solubility": -1 },
+    { "name": "Acetic acid", "formula": "CH3COOH", "phase": "l", "dHf": -484.3, "S": 159.8, "Cp": 123.3, "boil": 391.1, "density": 1.049, "solubility": -1, "common": "vinegar" },
+    { "name": "Glycerol", "formula": "C3H8O3", "phase": "l", "dHf": -669.6, "S": 206.3, "Cp": 218.9, "density": 1.26 },
+    { "name": "Tristearin", "formula": "C57H110O6", "phase": "s", "dHf": -2193.7, "S": 1200.0, "Cp": 1500.0, "density": 0.86, "common": "animal fat" },
+    { "name": "Sodium stearate", "formula": "C18H35NaO2", "phase": "s", "dHf": -948.0, "S": 400.0, "Cp": 500.0, "density": 1.03, "common": "soap" },
+    { "name": "Ethylene", "formula": "C2H4", "phase": "g", "dHf": 52.4, "S": 219.32, "Cp": 43.6 },
+    { "name": "Polyethylene", "formula": "C2H4", "phase": "s", "dHf": -25.0, "S": 100.0, "Cp": 60.0, "density": 0.94, "common": "plastic", "note": "Same formula as the monomer, different substance: polymerisation changes the structure, not the composition." },
+    { "name": "Hexadecane", "formula": "C16H34", "phase": "l", "dHf": -456.1, "S": 587.0, "Cp": 501.6, "density": 0.77, "common": "heavy oil" },
+    { "name": "Octane", "formula": "C8H18", "phase": "l", "dHf": -250.1, "S": 361.2, "Cp": 254.0, "density": 0.70, "common": "petrol" },
+    { "name": "Octene", "formula": "C8H16", "phase": "l", "dHf": -124.5, "S": 385.0, "Cp": 240.0, "density": 0.72 },
+
+    // -- nuclides. Formula is a LABEL here, not a composition: what matters is
+    //    the proton and nucleon count, which is what a nuclear reaction conserves.
+    { "name": "Uranium-235", "formula": "U-235", "phase": "s", "nuclear": true, "protons": 92, "nucleons": 235, "note": "Fissile. Under 1% of natural uranium, which is the entire difficulty." },
+    { "name": "Neutron", "formula": "n", "phase": "g", "nuclear": true, "protons": 0, "nucleons": 1 },
+    { "name": "Barium-141", "formula": "Ba-141", "phase": "s", "nuclear": true, "protons": 56, "nucleons": 141 },
+    { "name": "Krypton-92", "formula": "Kr-92", "phase": "g", "nuclear": true, "protons": 36, "nucleons": 92 }
+  ],
+
+  "reactions": [
+    // ---- fire ----
+    { "name": "Combustion of carbon", "class": "Combustion", "ignition": true,
+      "A": 1e9, "Ea": 160,
+      "reactants": [ {"formula":"C","phase":"s","n":1}, {"formula":"O2","phase":"g","n":1} ],
+      "products":  [ {"formula":"CO2","phase":"g","n":1} ],
+      "note": "The first reaction anyone controls. Everything downstream is heat from this." },
+
+    { "name": "Incomplete combustion of carbon", "class": "Combustion", "ignition": true,
+      "A": 1e9, "Ea": 150,
+      "reactants": [ {"formula":"C","phase":"s","n":2}, {"formula":"O2","phase":"g","n":1} ],
+      "products":  [ {"formula":"CO","phase":"g","n":2} ],
+      "note": "Starved of air, a fire makes carbon monoxide instead. That is not a failure -- it is the reducing agent every smelt depends on." },
+
+    { "name": "Boudouard equilibrium", "class": "Reduction", "reversible": true,
+      "A": 1e7, "Ea": 170, "minT": 970,
+      "reactants": [ {"formula":"C","phase":"s","n":1}, {"formula":"CO2","phase":"g","n":1} ],
+      "products":  [ {"formula":"CO","phase":"g","n":2} ],
+      "note": "Above about 970 K the equilibrium swings to CO. This single shift is why a charcoal furnace can smelt and a campfire cannot." },
+
+    { "name": "Combustion of wood", "class": "Combustion", "ignition": true,
+      "A": 1e8, "Ea": 130,
+      "reactants": [ {"formula":"C6H10O5","phase":"s","n":1}, {"formula":"O2","phase":"g","n":6} ],
+      "products":  [ {"formula":"CO2","phase":"g","n":6}, {"formula":"H2O","phase":"g","n":5} ] },
+
+    { "name": "Pyrolysis of wood to charcoal", "class": "Cracking",
+      "A": 1e6, "Ea": 120, "minT": 570,
+      "reactants": [ {"formula":"C6H10O5","phase":"s","n":1} ],
+      "products":  [ {"formula":"C","phase":"s","n":6}, {"formula":"H2O","phase":"g","n":5} ],
+      "note": "Heat wood without air and the water leaves, concentrating the carbon. Charcoal burns hotter than wood because it no longer has to boil its own moisture off." },
+
+    { "name": "Combustion of methane", "class": "Combustion", "ignition": true,
+      "A": 1e10, "Ea": 125,
+      "reactants": [ {"formula":"CH4","phase":"g","n":1}, {"formula":"O2","phase":"g","n":2} ],
+      "products":  [ {"formula":"CO2","phase":"g","n":1}, {"formula":"H2O","phase":"g","n":2} ] },
+
+    // ---- lime and pottery ----
+    { "name": "Calcination of limestone", "class": "Calcination",
+      "A": 1e8, "Ea": 200, "minT": 1120,
+      "reactants": [ {"formula":"CaCO3","phase":"s","n":1} ],
+      "products":  [ {"formula":"CaO","phase":"s","n":1}, {"formula":"CO2","phase":"g","n":1} ],
+      "note": "Needs a kiln, not a fire. The 1120 K threshold is why pottery comes before mortar." },
+
+    { "name": "Slaking of quicklime", "class": "Synthesis",
+      "A": 1e6, "Ea": 40,
+      "reactants": [ {"formula":"CaO","phase":"s","n":1}, {"formula":"H2O","phase":"l","n":1} ],
+      "products":  [ {"formula":"Ca(OH)2","phase":"s","n":1} ],
+      "note": "Violently exothermic. Quicklime left in the rain is a fire hazard." },
+
+    { "name": "Carbonation of lime mortar", "class": "Synthesis",
+      "A": 1e3, "Ea": 60,
+      "reactants": [ {"formula":"Ca(OH)2","phase":"s","n":1}, {"formula":"CO2","phase":"g","n":1} ],
+      "products":  [ {"formula":"CaCO3","phase":"s","n":1}, {"formula":"H2O","phase":"l","n":1} ],
+      "note": "Mortar sets by slowly turning back into the limestone it came from." },
+
+    { "name": "Firing of clay", "class": "Calcination",
+      "A": 1e7, "Ea": 180, "minT": 820,
+      "reactants": [ {"formula":"Al2Si2O5(OH)4","phase":"s","n":1} ],
+      "products":  [ {"formula":"Al2Si2O7","phase":"s","n":1}, {"formula":"H2O","phase":"g","n":2} ],
+      "note": "The chemically bound water leaves and does not come back. That irreversibility is the whole of pottery." },
+
+    // ---- copper and bronze ----
+    { "name": "Decomposition of malachite", "class": "Calcination",
+      "A": 1e7, "Ea": 110, "minT": 570,
+      "reactants": [ {"formula":"Cu2CO3(OH)2","phase":"s","n":1} ],
+      "products":  [ {"formula":"CuO","phase":"s","n":2}, {"formula":"CO2","phase":"g","n":1}, {"formula":"H2O","phase":"g","n":1} ],
+      "note": "Happens in an ordinary campfire. The green stone turning black is the first chemistry anybody ever noticed." },
+
+    { "name": "Carbothermic reduction of copper oxide", "class": "Reduction",
+      "A": 1e8, "Ea": 145, "minT": 1000,
+      "reactants": [ {"formula":"CuO","phase":"s","n":2}, {"formula":"C","phase":"s","n":1} ],
+      "products":  [ {"formula":"Cu","phase":"s","n":2}, {"formula":"CO2","phase":"g","n":1} ],
+      "note": "A pottery kiln reaches this. That is not a coincidence: copper smelting is discovered by potters." },
+
+    { "name": "Reduction of copper oxide by carbon monoxide", "class": "Reduction",
+      "A": 1e8, "Ea": 120, "minT": 800,
+      "reactants": [ {"formula":"CuO","phase":"s","n":1}, {"formula":"CO","phase":"g","n":1} ],
+      "products":  [ {"formula":"Cu","phase":"s","n":1}, {"formula":"CO2","phase":"g","n":1} ] },
+
+    { "name": "Roasting of chalcopyrite", "class": "Oxidation",
+      "A": 1e8, "Ea": 190, "minT": 900,
+      "reactants": [ {"formula":"CuFeS2","phase":"s","n":2}, {"formula":"O2","phase":"g","n":5} ],
+      "products":  [ {"formula":"Cu","phase":"s","n":2}, {"formula":"FeO","phase":"s","n":2}, {"formula":"SO2","phase":"g","n":4} ],
+      "note": "Sulfide ores must be roasted first. The sulfur dioxide is why smelters kill the vegetation downwind." },
+
+    { "name": "Carbothermic reduction of cassiterite", "class": "Reduction",
+      "A": 1e8, "Ea": 210, "minT": 1300,
+      "reactants": [ {"formula":"SnO2","phase":"s","n":1}, {"formula":"C","phase":"s","n":2} ],
+      "products":  [ {"formula":"Sn","phase":"s","n":1}, {"formula":"CO","phase":"g","n":2} ],
+      "note": "Tin metal. Alloy it with copper and you have bronze -- harder than either parent, which is not obvious and had to be found." },
+
+    // ---- iron and steel ----
+    { "name": "Reduction of hematite by carbon monoxide", "class": "Reduction",
+      "A": 1e9, "Ea": 230, "minT": 1200,
+      "reactants": [ {"formula":"Fe2O3","phase":"s","n":1}, {"formula":"CO","phase":"g","n":3} ],
+      "products":  [ {"formula":"Fe","phase":"s","n":2}, {"formula":"CO2","phase":"g","n":3} ],
+      "note": "The bloomery reaction. Needs both the temperature and a reducing atmosphere, which is why iron is thousands of years behind copper." },
+
+    { "name": "Reduction of magnetite by carbon monoxide", "class": "Reduction",
+      "A": 1e9, "Ea": 240, "minT": 1250,
+      "reactants": [ {"formula":"Fe3O4","phase":"s","n":1}, {"formula":"CO","phase":"g","n":4} ],
+      "products":  [ {"formula":"Fe","phase":"s","n":3}, {"formula":"CO2","phase":"g","n":4} ] },
+
+    { "name": "Direct carbothermic reduction of hematite", "class": "Reduction",
+      "A": 1e9, "Ea": 290, "minT": 1500,
+      "reactants": [ {"formula":"Fe2O3","phase":"s","n":2}, {"formula":"C","phase":"s","n":3} ],
+      "products":  [ {"formula":"Fe","phase":"s","n":4}, {"formula":"CO2","phase":"g","n":3} ] },
+
+    { "name": "Carburisation of iron", "class": "Synthesis",
+      "A": 1e6, "Ea": 160, "minT": 1000,
+      "reactants": [ {"formula":"Fe","phase":"s","n":3}, {"formula":"C","phase":"s","n":1} ],
+      "products":  [ {"formula":"Fe3C","phase":"s","n":1} ],
+      "note": "Carbon dissolving into hot iron. How much of it, and how it is then cooled, is the entire difference between wrought iron and steel." },
+
+    { "name": "Rusting of iron", "class": "Oxidation",
+      "A": 1e2, "Ea": 55,
+      "reactants": [ {"formula":"Fe","phase":"s","n":4}, {"formula":"O2","phase":"g","n":3} ],
+      "products":  [ {"formula":"Fe2O3","phase":"s","n":2} ],
+      "note": "Strongly downhill and very slow: the low pre-exponential factor is why iron tools last years rather than hours." },
+
+    { "name": "Thermite reaction", "class": "Reduction", "ignition": true,
+      "A": 1e10, "Ea": 200,
+      "reactants": [ {"formula":"Al","phase":"s","n":2}, {"formula":"Fe2O3","phase":"s","n":1} ],
+      "products":  [ {"formula":"Al2O3","phase":"s","n":1}, {"formula":"Fe","phase":"s","n":2} ],
+      "note": "Aluminium wants oxygen more than iron does, and the difference comes out as enough heat to melt the iron it makes." },
+
+    // ---- other metals ----
+    { "name": "Roasting of galena", "class": "Oxidation",
+      "A": 1e8, "Ea": 170, "minT": 870,
+      "reactants": [ {"formula":"PbS","phase":"s","n":2}, {"formula":"O2","phase":"g","n":3} ],
+      "products":  [ {"formula":"PbO","phase":"s","n":2}, {"formula":"SO2","phase":"g","n":2} ] },
+
+    { "name": "Reduction of litharge", "class": "Reduction",
+      "A": 1e8, "Ea": 110, "minT": 700,
+      "reactants": [ {"formula":"PbO","phase":"s","n":1}, {"formula":"CO","phase":"g","n":1} ],
+      "products":  [ {"formula":"Pb","phase":"s","n":1}, {"formula":"CO2","phase":"g","n":1} ],
+      "note": "Easy: lead smelts at temperatures a domestic hearth reaches, which is why lead poisoning is ancient." },
+
+    { "name": "Roasting of sphalerite", "class": "Oxidation",
+      "A": 1e8, "Ea": 180, "minT": 900,
+      "reactants": [ {"formula":"ZnS","phase":"s","n":2}, {"formula":"O2","phase":"g","n":3} ],
+      "products":  [ {"formula":"ZnO","phase":"s","n":2}, {"formula":"SO2","phase":"g","n":2} ] },
+
+    { "name": "Carbothermic reduction of zinc oxide", "class": "Reduction",
+      "A": 1e8, "Ea": 250, "minT": 1200,
+      "reactants": [ {"formula":"ZnO","phase":"s","n":1}, {"formula":"C","phase":"s","n":1} ],
+      "products":  [ {"formula":"Zn","phase":"s","n":1}, {"formula":"CO","phase":"g","n":1} ],
+      "note": "Zinc boils at 1180 K, below its own reduction temperature, so it comes off as vapour and must be condensed. Miss that and your zinc goes up the chimney." },
+
+    { "name": "Roasting of cinnabar", "class": "Oxidation",
+      "A": 1e7, "Ea": 130, "minT": 700,
+      "reactants": [ {"formula":"HgS","phase":"s","n":1}, {"formula":"O2","phase":"g","n":1} ],
+      "products":  [ {"formula":"Hg","phase":"l","n":1}, {"formula":"SO2","phase":"g","n":1} ] },
+
+    { "name": "Hydrogen reduction of tungsten trioxide", "class": "Reduction",
+      "A": 1e8, "Ea": 240, "minT": 1000,
+      "reactants": [ {"formula":"WO3","phase":"s","n":1}, {"formula":"H2","phase":"g","n":3} ],
+      "products":  [ {"formula":"W","phase":"s","n":1}, {"formula":"H2O","phase":"g","n":3} ],
+      "note": "Carbon would make a carbide, so tungsten needs hydrogen instead." },
+
+    // ---- water gas, ammonia, acid ----
+    { "name": "Water gas reaction", "class": "Reduction",
+      "A": 1e7, "Ea": 200, "minT": 1000,
+      "reactants": [ {"formula":"C","phase":"s","n":1}, {"formula":"H2O","phase":"g","n":1} ],
+      "products":  [ {"formula":"CO","phase":"g","n":1}, {"formula":"H2","phase":"g","n":1} ],
+      "note": "Steam over hot coke. The industrial source of hydrogen before anything else." },
+
+    { "name": "Haber-Bosch synthesis", "class": "Synthesis", "reversible": true,
+      "A": 1e8, "Ea": 230, "EaCatalysed": 95, "catalyst": "Fe",
+      "minT": 670, "minP": 15000000,
+      "reactants": [ {"formula":"N2","phase":"g","n":1}, {"formula":"H2","phase":"g","n":3} ],
+      "products":  [ {"formula":"NH3","phase":"g","n":2} ],
+      "note": "Needs high pressure AND an iron catalyst. Fewer gas molecules on the right, so Le Chatelier says pressure pushes it forward -- but without the catalyst it is far too slow to matter at any temperature the equilibrium tolerates." },
+
+    { "name": "Contact process", "class": "Oxidation", "reversible": true,
+      "A": 1e8, "Ea": 250, "EaCatalysed": 90, "catalyst": "V2O5", "minT": 700,
+      "reactants": [ {"formula":"SO2","phase":"g","n":2}, {"formula":"O2","phase":"g","n":1} ],
+      "products":  [ {"formula":"SO3","phase":"g","n":2} ] },
+
+    { "name": "Hydration of sulfur trioxide", "class": "Synthesis",
+      "A": 1e9, "Ea": 30,
+      "reactants": [ {"formula":"SO3","phase":"g","n":1}, {"formula":"H2O","phase":"l","n":1} ],
+      "products":  [ {"formula":"H2SO4","phase":"l","n":1} ] },
+
+    { "name": "Neutralisation of caustic soda", "class": "AcidBase",
+      "A": 1e11, "Ea": 15,
+      "reactants": [ {"formula":"NaOH","phase":"s","n":1}, {"formula":"HCl","phase":"g","n":1} ],
+      "products":  [ {"formula":"NaCl","phase":"s","n":1}, {"formula":"H2O","phase":"l","n":1} ],
+      "note": "Acid plus base gives salt plus water. Fast, and downhill at any temperature." },
+
+    // ---- electrochemistry ----
+    { "name": "Electrolysis of water", "class": "Electrolysis", "electricity": true,
+      "A": 1e6, "Ea": 60,
+      "reactants": [ {"formula":"H2O","phase":"l","n":2} ],
+      "products":  [ {"formula":"H2","phase":"g","n":2}, {"formula":"O2","phase":"g","n":1} ],
+      "note": "Thermodynamically uphill, which is exactly why it needs electricity: the current supplies the free energy the reaction cannot find on its own." },
+
+    { "name": "Chlor-alkali process", "class": "Electrolysis", "electricity": true,
+      "A": 1e6, "Ea": 80,
+      "reactants": [ {"formula":"NaCl","phase":"s","n":2}, {"formula":"H2O","phase":"l","n":2} ],
+      "products":  [ {"formula":"NaOH","phase":"s","n":2}, {"formula":"Cl2","phase":"g","n":1}, {"formula":"H2","phase":"g","n":1} ],
+      "note": "Salt and water into caustic soda, chlorine and hydrogen. Three industrial staples from seawater and a generator." },
+
+    { "name": "Hall-Heroult process", "class": "Electrolysis", "electricity": true,
+      "A": 1e6, "Ea": 120, "minT": 1230,
+      "reactants": [ {"formula":"Al2O3","phase":"s","n":2} ],
+      "products":  [ {"formula":"Al","phase":"s","n":4}, {"formula":"O2","phase":"g","n":3} ],
+      "note": "The reason aluminium is a modern metal despite being the commonest in the crust: nothing chemical will pull that oxygen off, so it takes brute electrical force." },
+
+    // ---- glass, biology, organics ----
+    { "name": "Soda-lime glass melt", "class": "Synthesis",
+      "A": 1e7, "Ea": 260, "minT": 1400,
+      "reactants": [ {"formula":"SiO2","phase":"s","n":1}, {"formula":"Na2CO3","phase":"s","n":1} ],
+      "products":  [ {"formula":"Na2SiO3","phase":"s","n":1}, {"formula":"CO2","phase":"g","n":1} ],
+      "note": "Soda ash drops silica's melting point by hundreds of degrees. Without that trick glass is unreachable." },
+
+    { "name": "Alcoholic fermentation", "class": "Fermentation",
+      "A": 1e5, "Ea": 60,
+      "reactants": [ {"formula":"C6H12O6","phase":"s","n":1} ],
+      "products":  [ {"formula":"C2H5OH","phase":"l","n":2}, {"formula":"CO2","phase":"g","n":2} ] },
+
+    { "name": "Acetic fermentation", "class": "Fermentation",
+      "A": 1e5, "Ea": 70,
+      "reactants": [ {"formula":"C2H5OH","phase":"l","n":1}, {"formula":"O2","phase":"g","n":1} ],
+      "products":  [ {"formula":"CH3COOH","phase":"l","n":1}, {"formula":"H2O","phase":"l","n":1} ] },
+
+    { "name": "Saponification of fat", "class": "Saponification",
+      "A": 1e6, "Ea": 65, "minT": 340,
+      "reactants": [ {"formula":"C57H110O6","phase":"s","n":1}, {"formula":"NaOH","phase":"s","n":3} ],
+      "products":  [ {"formula":"C3H8O3","phase":"l","n":1}, {"formula":"C18H35NaO2","phase":"s","n":3} ],
+      "note": "Fat plus wood-ash lye gives soap and glycerol. Discoverable by accident, and it was." },
+
+    { "name": "Polymerisation of ethylene", "class": "Polymerisation",
+      "A": 1e7, "Ea": 90, "minP": 10000000,
+      "reactants": [ {"formula":"C2H4","phase":"g","n":1} ],
+      "products":  [ {"formula":"C2H4","phase":"s","n":1} ],
+      "note": "Same composition, different substance. Polymerisation rearranges structure, not atoms, which is why both sides of this equation look identical." },
+
+    { "name": "Catalytic cracking", "class": "Cracking",
+      "A": 1e8, "Ea": 200, "minT": 750,
+      "reactants": [ {"formula":"C16H34","phase":"l","n":1} ],
+      "products":  [ {"formula":"C8H18","phase":"l","n":1}, {"formula":"C8H16","phase":"l","n":1} ],
+      "note": "Long hydrocarbons broken into short ones. Heavy oil into petrol." },
+
+    { "name": "Photosynthesis", "class": "Synthesis",
+      "A": 1e4, "Ea": 50,
+      "reactants": [ {"formula":"CO2","phase":"g","n":6}, {"formula":"H2O","phase":"l","n":6} ],
+      "products":  [ {"formula":"C6H12O6","phase":"s","n":1}, {"formula":"O2","phase":"g","n":6} ],
+      "note": "Strongly uphill: the free energy comes from sunlight, not from the reagents. Listed here because it is the reaction the entire food web runs on." },
+
+    { "name": "Respiration", "class": "Combustion",
+      "A": 1e5, "Ea": 55,
+      "reactants": [ {"formula":"C6H12O6","phase":"s","n":1}, {"formula":"O2","phase":"g","n":6} ],
+      "products":  [ {"formula":"CO2","phase":"g","n":6}, {"formula":"H2O","phase":"l","n":6} ],
+      "note": "Combustion run slowly and in stages. The same chemistry as a fire, at body temperature." },
+
+    { "name": "Gunpowder deflagration", "class": "Combustion", "ignition": true,
+      "A": 1e11, "Ea": 100,
+      "reactants": [ {"formula":"KNO3","phase":"s","n":2}, {"formula":"S","phase":"s","n":1}, {"formula":"C","phase":"s","n":3} ],
+      "products":  [ {"formula":"K2S","phase":"s","n":1}, {"formula":"N2","phase":"g","n":1}, {"formula":"CO2","phase":"g","n":3} ],
+      "note": "Three solids into two gases and a solid. The oxidiser is built in, so it burns without air -- that is what makes it a propellant rather than a fuel." },
+
+    // ---- nuclear, gated behind conditions nothing early can reach ----
+    { "name": "Fission of uranium-235", "class": "Nuclear",
+      "A": 1e12, "Ea": 20, "minT": 300, "energyMeV": 202.5,
+      "reactants": [ {"formula":"U-235","phase":"s","n":1}, {"formula":"n","phase":"g","n":1} ],
+      "products":  [ {"formula":"Ba-141","phase":"s","n":1}, {"formula":"Kr-92","phase":"g","n":1}, {"formula":"n","phase":"g","n":3} ],
+      "note": "Conserves nucleons and charge, NOT elements and not mass -- the missing mass is the energy. Needs enriched fissile material, which needs isotope separation, which is a very long way from a campfire." }
+  ]
+}
